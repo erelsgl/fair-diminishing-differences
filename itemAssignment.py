@@ -12,7 +12,7 @@ from partitions import equalPartitions
 import copy
 import itertools
 from operator import itemgetter
-
+import dicttools  # required for the doctests
 
 
 def findNDDProportionalAllocation(prefProfile):
@@ -30,8 +30,8 @@ def findNDDProportionalAllocation(prefProfile):
 
     >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([5,6,4,3,2,1]), "Carl":Pref([4,5,6,3,2,1])})
     >>> allocation = findNDDProportionalAllocation(prefProfile)
-    >>> sorted(allocation.items(),  key=lambda t: t[0])
-    [('Alice', [6, 1]), ('Bob', [5, 2]), ('Carl', [4, 3])]
+    >>> dicttools.stringify(allocation)
+    '{Alice:[6, 1], Bob:[5, 2], Carl:[4, 3]}'
     """
     itemsPerAgent = prefProfile.itemCount // prefProfile.agentCount
 
@@ -54,23 +54,23 @@ def findNDDProportionalAllocation(prefProfile):
         prefProfile.agents.reverse()
     return allocation
 
-def findABCCBAAllocation(prefProfile):
+def findABCCBAAllocation(prefProfile:PrefProfile):
     """
     INPUT:
-    prefProfile: a PrefProfile object.
+    prefProfile: a PrefProfile object representing several agents with ordinal valuations.
 
     OUTPUT:
     An allocation where the agents pick in sequence A B C C B A A B C ...
 
     >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([6,5,4,3,2,1]), "Carl":Pref([6,5,4,3,2,1])})
     >>> allocation = findABCCBAAllocation(prefProfile)
-    >>> sorted(allocation.items(),  key=lambda t: t[0])
-    [('Alice', [6, 1]), ('Bob', [5, 2]), ('Carl', [4, 3])]
+    >>> dicttools.stringify(allocation)
+    '{Alice:[6, 1], Bob:[5, 2], Carl:[4, 3]}'
 
     >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([5,6,4,3,2,1]), "Carl":Pref([4,5,6,3,2,1])})
     >>> allocation = findABCCBAAllocation(prefProfile)
-    >>> sorted(allocation.items(),  key=lambda t: t[0])
-    [('Alice', [6, 1]), ('Bob', [5, 2]), ('Carl', [4, 3])]
+    >>> dicttools.stringify(allocation)
+    '{Alice:[6, 1], Bob:[5, 2], Carl:[4, 3]}'
     """
     itemsPerAgent = prefProfile.itemCount // prefProfile.agentCount
     allocation = {agent:list() for agent in prefProfile.agents}
@@ -211,8 +211,6 @@ def isCardinallyProportional(prefProfile, allocation):
     >>> allocation = {"Alice":[6,2], "Bob":[5,1], "Carl":[4,3]}
     >>> isCardinallyProportional(prefProfile,allocation)
     False
-
-    >>> prefProfile = PrefProfile({"Alice":Pref(ordinal=[2,1,3,4,6,5]), "Bob":Pref(ordinal=[4,3,6,5,2,1])})
     """
     agentCount = prefProfile.agentCount
     for (agent,pref) in prefProfile.agentsToPrefs.items():
@@ -220,6 +218,35 @@ def isCardinallyProportional(prefProfile, allocation):
         totalValue  = pref.valueOf(pref.ordinal) # all items
         if agentsValue * agentCount < totalValue:
             return False
+    return True
+
+
+def isCardinallyEnvyFree(prefProfile, allocation):
+    """
+    INPUT:
+    prefProfile: a PrefProfile with cardinal utilities.
+    allocation: a dictionary that maps agents to their bundles.
+
+    OUTPUT:
+    True iff the given allocation is envy-free according to the agents' cardinal value function
+
+    >>> prefProfile = PrefProfile({"Alice":Pref(cardinal={6:6,5:5,4:4,3:3,2:2,1:1}), "Bob":Pref(cardinal={6:6,5:5,4:4,3:3,2:2,1:1}), "Carl":Pref(cardinal={6:6,5:5,4:4,3:3,2:2,1:1})})
+
+    >>> allocation = {"Alice":[6,1], "Bob":[5,2], "Carl":[4,3]}
+    >>> isCardinallyEnvyFree(prefProfile,allocation)
+    True
+
+    >>> allocation = {"Alice":[6,2], "Bob":[5,1], "Carl":[4,3]}
+    >>> isCardinallyEnvyFree(prefProfile,allocation)
+    False
+    """
+    agentCount = prefProfile.agentCount
+    for (agent,pref) in prefProfile.agentsToPrefs.items():
+        agentsValueToOwnBundle = pref.valueOf(allocation[agent])
+        for otherAgent in prefProfile.agents:
+            agentsValueToOtherBundle = pref.valueOf(allocation[otherAgent])
+            if agentsValueToOwnBundle < agentsValueToOtherBundle:
+                return False
     return True
 
 
@@ -233,7 +260,7 @@ def duplicateEachItem(bundle,times):
     return itertools.chain.from_iterable([item]*times for item in bundle)
 
 
-def isProportional(prefProfile, allocation, isWeaklyBetter):
+def isProportional(prefProfile:PrefProfile, allocation:dict, isWeaklyBetter):
     """
     INPUT:
     prefProfile: a dictionary that maps agents to their Pref object.
@@ -279,7 +306,6 @@ def isProportional(prefProfile, allocation, isWeaklyBetter):
     >>> isNDDProportional(prefProfile,allocation)
     True
     """
-    itemCount = prefProfile.itemCount
     agentCount = prefProfile.agentCount
     for (agent,pref) in prefProfile.agentsToPrefs.items():
         bundle = allocation[agent]

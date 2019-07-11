@@ -27,10 +27,16 @@ def checkProportional(prefProfile:PrefProfile):
 	"""
 	INPUT: a preference profile.
 
-	OUTPUT (bool,bool):  whether an NDDPR allocation exists for the given profile,
-	and if it exists, whether it is cardinally fair.
+	OUTPUT:  a vector of booleans, indicating whether this profile admits various kinds of allocations.
 	"""
-	sumNecExists = sumNDDExists = sumNDDExistsFair = sumPDDExists = sumPDDExistsFair = sumPosExists  = sumPosExistsFair = 0
+	sumNecPropExists = \
+		sumNDDPropExists = sumNDDPropExistsFair = \
+		sumPDDPropExists = sumPDDPropExistsFair = \
+		sumPosPropExists  = sumPosPropExistsFair = 0
+	sumNecEFExists = \
+		sumNDDEFExists = sumNDDEFExistsFair = \
+		sumPDDEFExists = sumPDDEFExistsFair = \
+		sumPosEFExists  = sumPosEFExistsFair = 0
 	for allocation in equalPartitions(prefProfile.agents, prefProfile.items):
 		isNecProp  = isNecessarilyProportional(prefProfile, allocation)
 		isCardProp = isCardinallyProportional(prefProfile, allocation)
@@ -38,23 +44,43 @@ def checkProportional(prefProfile:PrefProfile):
 		isPDDProp  = isPDDProportional(prefProfile, allocation)
 		isPosProp  = isPossiblyProportional(prefProfile, allocation)
 
+		isNecEF    = isNecessarilyEnvyFree(prefProfile, allocation)
+		isCardEF   = isCardinallyEnvyFree(prefProfile, allocation)
+		isNDDEF  = isNDDEnvyFree(prefProfile, allocation)
+		isPDDEF  = isPDDEnvyFree(prefProfile, allocation)
+		isPosEF  = isPossiblyEnvyFree(prefProfile, allocation)
+
 		# Sanity checks:
 		if isNecProp: assert isNDDProp
 		if isNDDProp: assert isPDDProp
 		if isPDDProp: assert isPosProp
 		if isNecProp: assert isCardProp
-		#if isCardProp: assert isPosProp
+		
+		if isNecEF: assert isNecProp
+		if isCardEF: assert isCardProp
+		if isNDDEF: assert isNDDProp
+		if isPDDEF: assert isPDDProp
+		if isPosEF: assert isPosProp
 
 		# Sums:
-		sumNecExists += isNecProp
-		sumNDDExists += isNDDProp
-		sumNDDExistsFair += (isNDDProp and isCardProp)
-		sumPDDExists += isPDDProp
-		sumPDDExistsFair += (isPDDProp and isCardProp)
-		sumPosExists += isPosProp
-		sumPosExistsFair += (isPosProp and isCardProp)
+		sumNecPropExists += isNecProp
+		sumNDDPropExists += isNDDProp
+		sumNDDPropExistsFair += (isNDDProp and isCardProp)
+		sumPDDPropExists += isPDDProp
+		sumPDDPropExistsFair += (isPDDProp and isCardProp)
+		sumPosPropExists += isPosProp
+		sumPosPropExistsFair += (isPosProp and isCardProp)
 
-		if isNecProp: break
+		sumNecEFExists += isNecEF
+		sumNDDEFExists += isNDDEF
+		sumNDDEFExistsFair += (isNDDEF and isCardEF)
+		sumPDDEFExists += isPDDEF
+		sumPDDEFExistsFair += (isPDDEF and isCardEF)
+		sumPosEFExists += isPosEF
+		sumPosEFExistsFair += (isPosEF and isCardEF)
+
+		if isNecEF: break  # strongest condition - no need to check further
+
 
 	allocation = findABCCBAAllocation(prefProfile)
 	sumABCCBANecProp  = isNecessarilyProportional(prefProfile, allocation)
@@ -63,16 +89,16 @@ def checkProportional(prefProfile:PrefProfile):
 	sumABCCBAPDDProp  = isPDDProportional(prefProfile, allocation)
 	sumABCCBAPosProp  = isPossiblyProportional(prefProfile, allocation)
 
-	return (sumNecExists>0, \
-			sumNDDExists>0, \
+	return (sumNecPropExists>0, \
+			sumNDDPropExists>0, \
 			# sumNDDExistsFair/sumNDDExists if sumNDDExists>0 else 0, \
-			sumABCCBACardProp if sumNDDExists>0 else 0, \
-			sumPDDExists>0, \
+			sumABCCBACardProp if sumNDDPropExists>0 else 0, \
+			sumPDDPropExists>0, \
 			# sumPDDExistsFair/sumPDDExists if sumPDDExists>0 else 0, \
-			sumABCCBACardProp if sumPDDExists>0 else 0, \
-			sumPosExists>0, \
+			sumABCCBACardProp if sumPDDPropExists>0 else 0, \
+			sumPosPropExists>0, \
 			#sumPosExistsFair/sumPosExists if sumPosExists>0 else 0, \
-			sumABCCBACardProp if sumPosExists>0 else 0, \
+			sumABCCBACardProp if sumPosPropExists>0 else 0, \
 			sumABCCBACardProp, \
 			prefProfile.countDiminishingDifferences()/prefProfile.agentCount
 			)
@@ -89,6 +115,7 @@ def calcFractions(agents, items, lowMarketValue, highMarketValue, maxNoiseSize, 
 		sums = map(operator.add, sums, checkProportional(prefProfile))
 	return map(lambda x: x/iterations, sums)
 
+
 def cardinalSimulation(agents, itemCounts, lowMarketValue, highMarketValue, maxNoiseSizeList, iterations, filename):
 	results =  DataFrame(columns=('Agents', 'Iterations', 'Noise size', 'Items per agent', 'NecPR exists', 'NDDPR exists', 'NDDPR fair', 'PDDPR exists', 'PDDPR fair', 'PosPR exists', 'PosPR fair', 'ABCCBA fair', 'DD'))
 	agentCount = len(agents)
@@ -103,7 +130,14 @@ def cardinalSimulation(agents, itemCounts, lowMarketValue, highMarketValue, maxN
 			print(timer() - start)
 	return results
 
-def experiments(agents, iterations, filename):
+def experiments(agents:list, iterations:int, filename:str):
+	"""
+	Main routine for running the experiments
+	:param agents:
+	:param iterations:
+	:param filename:
+	:return:
+	"""
 	agentCount = len(agents)
 
 	itemCounts1 = 5 if agentCount==2 else 4

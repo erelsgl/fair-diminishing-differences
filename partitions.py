@@ -1,4 +1,5 @@
 #!python3
+
 """
 This unit contains functions that loop over all possible partitions of items to agents.
 

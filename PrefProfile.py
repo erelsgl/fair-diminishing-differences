@@ -4,19 +4,20 @@ from Pref import Pref
 
 class PrefProfile(object):
 	"""
-      Represents a profile of preferences (Pref objects) of several agents.
+	Represents a set of several agents with different preferences
+	Each agent has a name, and a Pref object representing its preferences.
 
-      Author: Erel Segai-Halevi
-      Date:   2017-02
+    Author: Erel Segai-Halevi
+    Date:   2017-02
 	"""
 
-	def __init__(self, agentsToPrefs):
+	def __init__(self, mapAgentsToPrefs:dict):
 		"""
-			agentsToPrefs: a dictionary that maps agents to Pref objects.
+		mapAgentsToPrefs: a dictionary that maps agents to Pref objects.
 		"""
-		self.agentsToPrefs = agentsToPrefs
-		self.prefs = list(agentsToPrefs.values())
-		self.agents = sorted(agentsToPrefs.keys())
+		self.agentsToPrefs = mapAgentsToPrefs
+		self.prefs = list(mapAgentsToPrefs.values())
+		self.agents = sorted(mapAgentsToPrefs.keys())
 		self.items = sorted(next(iter(self.prefs)).ordinal)
 		self.itemCount = len(self.items)
 		self.agentCount = len(self.agents)
@@ -29,6 +30,11 @@ class PrefProfile(object):
 		return self.prefs.__repr__()
 
 	def removeItem(self, item):
+		"""
+		Remove the given item from all preferences in this profile.
+		:param item:
+		:return:
+		"""
 		if item in self.items:
 			self.items.remove(item)
 			for pref in self.prefs:
@@ -37,14 +43,20 @@ class PrefProfile(object):
 		else:
 			raise ValueError("item "+str(item)+" not found")
 
+
 	def countDiminishingDifferences(self):
 		"""
-			count the number of profiles with the DD property
+		count the number of preferences in this profile that have the DD property
 		"""
 		return sum(map(Pref.isDiminishingDifferences, self.prefs))
 
+
 	@staticmethod
 	def randomCardinal(agents, items, lowMarketValue,highMarketValue,maxNoiseSize):
+		"""
+		Create a random preference-profile with cardinal utilities.
+		Randomization is uniform.
+		"""
 		marketValues = {
 			item: np.random.uniform(lowMarketValue,highMarketValue)
 			for item in items
@@ -54,6 +66,10 @@ class PrefProfile(object):
 
 	@staticmethod
 	def randomCardinalGaussian(agents, items, lowMarketValue,highMarketValue,stddev):
+		"""
+		Create a random preference-profile with cardinal utilities.
+		Randomization is Gaussian.
+		"""
 		marketValues = {
 			item: np.random.uniform(lowMarketValue,highMarketValue)
 			for item in items

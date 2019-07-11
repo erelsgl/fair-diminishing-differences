@@ -14,7 +14,7 @@ class Pref(object):
       Date:   2017-02
 	"""
 
-	def __init__(self, ordinal=None, cardinal=None):
+	def __init__(self, ordinal:list=None, cardinal:dict=None):
 		"""
 			cardinal: a dictionary that maps items to their values. If it is given, it will also determine the ranking.
 
