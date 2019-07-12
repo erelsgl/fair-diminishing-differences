@@ -184,7 +184,7 @@ def plots(results1, results2):
 if __name__ == "__main__":
 	agents = [1,2]
 	iterations = 1000
-	createResults = False
+	createResults = True
 	if createResults:
 		filename = str(datetime.now())
 		(results1, results2) = experiments(agents, iterations, filename)

@@ -13,6 +13,7 @@ import copy
 import itertools
 from operator import itemgetter
 import dicttools  # required for the doctests
+import random
 
 
 def findNDDProportionalAllocation(prefProfile):
@@ -61,6 +62,7 @@ def findABCCBAAllocation(prefProfile:PrefProfile):
 
     OUTPUT:
     An allocation where the agents pick in sequence A B C C B A A B C ...
+    The agents are ordered in lexicographic order.
 
     >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([6,5,4,3,2,1]), "Carl":Pref([6,5,4,3,2,1])})
     >>> allocation = findABCCBAAllocation(prefProfile)
@@ -75,12 +77,89 @@ def findABCCBAAllocation(prefProfile:PrefProfile):
     itemsPerAgent = prefProfile.itemCount // prefProfile.agentCount
     allocation = {agent:list() for agent in prefProfile.agents}
     prefProfile = copy.deepcopy(prefProfile)
+    agents = sorted(prefProfile.agents)
     for iteration in range(itemsPerAgent):
-        for agent in prefProfile.agents:
-            item = prefProfile.agentsToPrefs[agent].bestItem()
+        for agent in agents:
+            # print(" choosing: "+agent)
+            pref = prefProfile.agentsToPrefs[agent]
+            item = pref.bestItem()
             allocation[agent].append(item)
             prefProfile.removeItem(item)
-        prefProfile.agents.reverse()
+        agents.reverse()
+    return allocation
+
+def findABCCBAAllocation(prefProfile:PrefProfile):
+    """
+    INPUT:
+    prefProfile: a PrefProfile object representing several agents with ordinal valuations.
+
+    OUTPUT:
+    An allocation where the agents pick in sequence A B C C B A A B C ...
+    The agents are ordered in lexicographic order.
+
+    >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([6,5,4,3,2,1]), "Carl":Pref([6,5,4,3,2,1])})
+    >>> allocation = findABCCBAAllocation(prefProfile)
+    >>> dicttools.stringify(allocation)
+    '{Alice:[6, 1], Bob:[5, 2], Carl:[4, 3]}'
+
+    >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([5,6,4,3,2,1]), "Carl":Pref([4,5,6,3,2,1])})
+    >>> allocation = findABCCBAAllocation(prefProfile)
+    >>> dicttools.stringify(allocation)
+    '{Alice:[6, 1], Bob:[5, 2], Carl:[4, 3]}'
+    """
+    itemsPerAgent = prefProfile.itemCount // prefProfile.agentCount
+    allocation = {agent:list() for agent in prefProfile.agents}
+    prefProfile = copy.deepcopy(prefProfile)
+    agents = sorted(prefProfile.agents)
+    for iteration in range(itemsPerAgent):
+        for agent in agents:
+            # print(" choosing: "+agent)
+            pref = prefProfile.agentsToPrefs[agent]
+            item = pref.bestItem()
+            allocation[agent].append(item)
+            prefProfile.removeItem(item)
+        agents.reverse()
+    return allocation
+
+def findABCRandomAllocation(prefProfile:PrefProfile):
+    """
+    INPUT:
+    prefProfile: a PrefProfile object representing several agents with ordinal valuations.
+
+    OUTPUT:
+    An allocation where each agent receives his best item (if possible), and the remaining items are allocated at random.
+
+    Written to answer a question by an anonymous JAIR reviewer:
+    "How nontrivial is the fact that when an NDDPR allocation exists, it turns out to be PR w.r.t. the true utilities with a high
+     probability? For baseline, if you just gave each agent their favorite item, and allocated the rest randomly, how likely would this be PR?"
+
+    >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([4,5,6,3,2,1]), "Carl":Pref([6,5,4,3,2,1])})
+    >>> allocation = findABCRandomAllocation(prefProfile)
+    >>> allocation["Alice"][0]
+    6
+    >>> allocation["Bob"][0]
+    4
+    >>> allocation["Carl"][0]
+    5
+
+    """
+    itemsPerAgent = prefProfile.itemCount // prefProfile.agentCount
+    allocation = {agent:list() for agent in prefProfile.agents}
+    prefProfile = copy.deepcopy(prefProfile)
+    agents = sorted(prefProfile.agents)
+
+    for agent in agents:
+        pref = prefProfile.agentsToPrefs[agent]
+        item = pref.bestItem()
+        allocation[agent].append(item)
+        prefProfile.removeItem(item)
+
+    for iteration in range(itemsPerAgent-1):
+        for agent in agents:
+            item = random.choice(prefProfile.items)
+            allocation[agent].append(item)
+            prefProfile.removeItem(item)
+
     return allocation
 
 
@@ -252,7 +331,7 @@ def isCardinallyEnvyFree(prefProfile, allocation):
 
 
 
-def duplicateEachItem(bundle,times):
+def duplicateEachItem(bundle:list, times:int):
     """
     >>> list(duplicateEachItem([2,1,3],3))
     [2, 2, 2, 1, 1, 1, 3, 3, 3]

@@ -50,9 +50,22 @@ class PrefProfile(object):
 		"""
 		return sum(map(Pref.isDiminishingDifferences, self.prefs))
 
+	def bestItems(self)->set:
+		"""
+		returns a set of the best items of all agents.
+
+	    >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([5,6,4,3,2,1]), "Carl":Pref([4,5,6,3,2,1])})
+	    >>> sorted(prefProfile.bestItems())
+	    [4, 5, 6]
+	    >>> prefProfile = PrefProfile({"Alice":Pref([6,5,4,3,2,1]), "Bob":Pref([6,5,4,3,2,1]), "Carl":Pref([4,5,6,3,2,1])})
+	    >>> sorted(prefProfile.bestItems())
+	    [4, 6]
+		"""
+		return set(map(Pref.bestItem, self.prefs))
+
 
 	@staticmethod
-	def randomCardinal(agents, items, lowMarketValue,highMarketValue,maxNoiseSize):
+	def randomCardinal(agents:list, items:list, lowMarketValue:float, highMarketValue:float, maxNoiseSize:float):
 		"""
 		Create a random preference-profile with cardinal utilities.
 		Randomization is uniform.
@@ -65,7 +78,7 @@ class PrefProfile(object):
 
 
 	@staticmethod
-	def randomCardinalGaussian(agents, items, lowMarketValue,highMarketValue,stddev):
+	def randomCardinalGaussian(agents:list, items:list, lowMarketValue:float, highMarketValue:float, stddev:float):
 		"""
 		Create a random preference-profile with cardinal utilities.
 		Randomization is Gaussian.
@@ -79,7 +92,8 @@ class PrefProfile(object):
 
 if __name__ == "__main__":
 	import doctest
-	doctest.testmod()
+	(failures, tests) = doctest.testmod(report=True)
+	print("{} failures, {} tests".format(failures, tests))
 
 	prof1 = PrefProfile.randomCardinal(["A","B","C"], [1,2,3], 500, 1000, 100)
 	print(prof1)
