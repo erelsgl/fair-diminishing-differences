@@ -25,10 +25,10 @@ def checkProportionality(prefProfile: PrefProfile):
 	INPUT: a preference profile.
 
 	OUTPUT:  a vector of booleans indicating whether this profile admits various kinds of proportional allocations.
-
-    >>> prefProfile = PrefProfile({"Alice":Pref(cardinal={6:6,5:5,4:4,3:3,2:2,1:1}), "Bob":Pref(cardinal={6:6,5:5,4:4,3:3,2:2,1:1})})
-    >>> checkSingleProfile(prefProfile)
-    (False, False, 0, True, False, True, False, False, 1.0)
+    #
+    # >>> prefProfile = PrefProfile({"Alice":Pref(cardinal={6:6,5:5,4:4,3:3,2:2,1:1}), "Bob":Pref(cardinal={6:6,5:5,4:4,3:3,2:2,1:1})})
+    # >>> checkProportionality(prefProfile)
+    # (0, False, 0, 0, False, 0, 0, False, 4, 0, True, 10, 0, True, 0, 0, False, 0, 0, False)
 	"""
 	sumFair = \
 		sumNecProp = sumNecPropFair = \
@@ -77,48 +77,56 @@ def checkProportionality(prefProfile: PrefProfile):
 	isBaselineFair = isCardinallyProportional(prefProfile, Baseline_allocation)
 	sumBaselineFair += (sumFair if (isBaseline and isBaselineFair) else 0)
 
-	return (sumFair,
+	return (sumFair, \
+			sumFair > 0, \
 			sumNecProp, \
 			sumNecPropFair, \
+			sumNecProp > 0, \
 			sumNDDProp, \
 			sumNDDPropFair, \
+			sumNDDProp > 0, \
 			sumPDDProp, \
 			sumPDDPropFair, \
+			sumPDDProp > 0, \
 			sumPosProp, \
 			sumPosPropFair, \
+			sumPosProp > 0, \
 			sumABCCBA, \
 			sumABCCBAFair, \
+			sumABCCBA   > 0,\
 			sumBaseline, \
 			sumBaselineFair, \
+			sumBaseline > 0,\
 			)
 
 columnNames = (
-	'Cardinally fair',
-	'NecPR', 'NecPR and fair',
-	'NDDPR', 'NDDPR and fair',
-	'PDDPR', 'PDDPR and fair',
-	'PosPR', 'PosPR and fair',
-	'ABCCBA','ABCCBA and fair',
-	'Baseline', 'Baseline and fair',
+	'Cardinally fair', 'Fair exists',
+	'NecPR', 'NecPR and fair', 'NecPR exists',
+	'NDDPR', 'NDDPR and fair', 'NDDPR exists',
+	'PDDPR', 'PDDPR and fair', 'PDDPR exists',
+	'PosPR', 'PosPR and fair', 'PosPR exists',
+	'ABCCBA','ABCCBA and fair', 'ABCCBA exists',
+	'Baseline', 'Baseline and fair', 'Baseline exists',
 )
 
 
 
 if __name__ == "__main__":
 	simulations.trace = print
-	agents = [1,2,3]
-	iterations = 50
+	agents = (1,2,3)
+	iterations = 1000
 	createResults = True
 	if createResults:
 		# filename = str(datetime.now())
 		# filename = "2agents-1000iters-pr"
-		filename = "3agents-50iters-pr"
+		filename = "3agents-1000iters-pr"
+		# filename = "3agents-50iters-pr"
 		(results1, results2) = simulations.simulateTwice(
 			checkProportionality, columnNames, agents, iterations, filename)
 	else:   # Use existing results:
-		# filename = "3agents-200iters"
+		filename = "3agents-50iters-pr"
 		# filename = "2agents-1000iters"
-		filename = "2agents-1000iters-pr"
+		# filename = "2agents-1000iters-pr"
 		results1 = pandas.read_csv("results/"+filename+"-noise.csv")
 		results2 = pandas.read_csv("results/"+filename+"-items.csv")
 
@@ -128,8 +136,14 @@ if __name__ == "__main__":
 			r[c+' precision'] = r.apply( \
 				lambda row: row[c+' and fair'] / row[c], \
 				axis=1)
+			r[c+' precision err'] = r.apply( \
+				lambda row: row[c+' and fair err'] / row[c], \
+				axis=1)
 			r[c+' recall'] = r.apply( \
-				lambda row: row[c+' and fair'] / row['Cardinally fair'], \
+				lambda row: row[c+' exists'], \
+				axis=1)
+			r[c+' recall err'] = r.apply( \
+				lambda row: row[c+' exists err'], \
 				axis=1)
 			r[c+' F1'] = r.apply( \
 				lambda row: (2*row[c+' precision']*row[c+' recall'])/(row[c+' precision']+row[c+' recall']), \
@@ -137,19 +151,19 @@ if __name__ == "__main__":
 
 	columnsForPrecision = [
 		('NecPR precision', 'k-o'),
+		('ABCCBA precision', 'c-x'),
 		('NDDPR precision', 'b-h'),
+		('Baseline precision', 'm-1'),
 		('PDDPR precision', 'g-s'),
 		('PosPR precision', 'r-v'),
-		('ABCCBA precision', 'c-x'),
-		('Baseline precision', 'm-1'),
 	]
 	columnsForRecall = [
-		('NecPR recall', 'k-o'),
-		('NDDPR recall', 'b-h'),
-		('PDDPR recall', 'g-s'),
 		('PosPR recall', 'r-v'),
-		('ABCCBA recall', 'c-x'),
-		('Baseline recall', 'm-1'),
+		# ('ABCCBA recall', 'c-x'),
+		# ('Baseline recall', 'm-1'),
+		('PDDPR recall', 'g-s'),
+		('NDDPR recall', 'b-h'),
+		('NecPR recall', 'k-o'),
 	]
 	columnsForF1 = [
 		('NecPR F1', 'k-o'),
@@ -159,6 +173,6 @@ if __name__ == "__main__":
 		('ABCCBA F1', 'c-x'),
 		('Baseline F1', 'm-1'),
 	]
-	simulations.plotResults(results1, results2, columnsForPrecision)
-	simulations.plotResults(results1, results2, columnsForRecall)
-	simulations.plotResults(results1, results2, columnsForF1)
+	simulations.plotResults(results1, results2, columnsForPrecision, title="precision", errorbars=True)
+	simulations.plotResults(results1, results2, columnsForRecall, title="recall", errorbars=True)
+	# simulations.plotResults(results1, results2, columnsForF1, errorbars=False)

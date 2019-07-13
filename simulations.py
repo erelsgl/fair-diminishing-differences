@@ -149,7 +149,7 @@ def simulateTwice(checkSingleProfile, columnNames:list,
         )
     trace(results1)
 
-    itemCounts = [2,3,4,5,6,7,8]  if agentCount==2 else [2,3,4,5,6]
+    itemCounts = [2,3,4,5,6,7,8]  if agentCount==2 else [2,3,4,5]
     results2 = simulate(checkSingleProfile, columnNames,
         agents,
         itemCounts = itemCounts,
@@ -171,13 +171,13 @@ legendFontSize = 10
 axesFontSize = 16
 
 
-def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, errorbars:bool=False):
+def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, title:str="probability", errorbars:bool=False):
     ax = plt.subplot(1, 2, 1)
     agentCount = int(results1['Agents'][0])
     iterations = int(results1['Iterations'][0])
     itemCounts1 = int(results1['Items per agent'][0])
 
-    ax.set_title("probability vs. noise, " + str(agentCount) + ' agents, ' + str(itemCounts1) + ' items per agent',
+    ax.set_title(title+" vs. noise, " + str(agentCount) + ' agents, ' + str(itemCounts1) + ' items per agent',
                  fontsize=titleFontSize, weight='bold')
     ax.set_xlabel('Noise size', fontsize=axesFontSize)
 
@@ -192,7 +192,7 @@ def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, e
     iterations = int(results2['Iterations'][0])
     maxNoise = results2['Noise size'][0]
 
-    ax.set_title("probability vs. items, " + str(agentCount) + ' agents, |noise|<=' + str(maxNoise),
+    ax.set_title(title+" vs. items, " + str(agentCount) + ' agents, |noise|<=' + str(maxNoise),
                  fontsize=titleFontSize, weight='bold')
     ax.set_xlabel('Items per agent', fontsize=axesFontSize)
 
