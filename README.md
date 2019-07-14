@@ -2,19 +2,18 @@
 
 Algorithms for fair allocation of items among agents with ordinal preferences,
 assuming their underlying valuations have diminishing differences.
+See [this paper](https://arxiv.org/abs/1705.07993) for details.
 
 Prerequisites:
 
     pip3 install dicttools
 
-Running the experiments reported in [this paper](https://arxiv.org/abs/1705.07993):
-
-For the IJCAI 2017 experiment:
+To run the experiment reported in the IJCAI 2017 paper:
 
     python3 main-IJCAI17-experiment.py    
 
-For the JAIR experiments:
+To run the experiment reported in the JAIR paper:
 
-    python3 main.py
+    python3 main-precision-and-recall.py
 
 It should create the graphs that appear in the paper.

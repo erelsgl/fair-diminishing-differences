@@ -115,17 +115,16 @@ if __name__ == "__main__":
 	simulations.trace = print
 	agents = (1,2,3)
 	iterations = 1000
-	createResults = True
+	createResults = False
 	if createResults:
 		# filename = str(datetime.now())
 		# filename = "2agents-1000iters-pr"
-		filename = "3agents-1000iters-pr"
+		filename = "3agents-1000iters-pra"
 		# filename = "3agents-50iters-pr"
 		(results1, results2) = simulations.simulateTwice(
 			checkProportionality, columnNames, agents, iterations, filename)
 	else:   # Use existing results:
-		filename = "3agents-50iters-pr"
-		# filename = "2agents-1000iters"
+		filename = "3agents-1000iters-pr"
 		# filename = "2agents-1000iters-pr"
 		results1 = pandas.read_csv("results/"+filename+"-noise.csv")
 		results2 = pandas.read_csv("results/"+filename+"-items.csv")
@@ -137,7 +136,7 @@ if __name__ == "__main__":
 				lambda row: row[c+' and fair'] / row[c], \
 				axis=1)
 			r[c+' precision err'] = r.apply( \
-				lambda row: row[c+' and fair err'] / row[c], \
+				lambda row: row[c+' and fair err'] / row[c] if row[c+' and fair'] < row[c] else 0, \
 				axis=1)
 			r[c+' recall'] = r.apply( \
 				lambda row: row[c+' exists'], \
@@ -153,8 +152,8 @@ if __name__ == "__main__":
 		('NecPR precision', 'k-o'),
 		('ABCCBA precision', 'c-x'),
 		('NDDPR precision', 'b-h'),
-		('Baseline precision', 'm-1'),
 		('PDDPR precision', 'g-s'),
+		('Baseline precision', 'm-1'),
 		('PosPR precision', 'r-v'),
 	]
 	columnsForRecall = [
