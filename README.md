@@ -8,12 +8,16 @@ Prerequisites:
 
     pip3 install dicttools
 
-To run the experiment reported in the IJCAI 2017 paper:
+The main files for running the experiments are in several files:
 
-    python3 main-IJCAI17-experiment.py    
+*  main-IJCAI17-experiment.py -- the experiment reported in the IJCAI 2017 paper.
+*  main-JAIR-proportionality.py -- the experiments reported in the JAIR paper, for 2 or 3 agents and various criteria of proportionality.
+*  main-JAIR-envyfreeness.py -- additional experiments, for 3 agents and various criteria of envy-freeness.
 
-To run the experiment reported in the JAIR paper:
+Each main file contains a variable named createResults:
 
-    python3 main-precision-and-recall.py
-
-It should create the graphs that appear in the paper.
+* If it is True, then new experiments will be done and new result files will be created in the "results" folder.
+You can set the parameters of the experiment (e.g. number of agents, number of iterations) in the main file. 
+* If it is False, then results from previous experiments (stored in the results folder) will be plotted. 
+You can choose the file to plot in the main file.
+ 
