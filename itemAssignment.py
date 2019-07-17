@@ -1,6 +1,6 @@
 #!python3
 """
-Procedures for fair item assignment.
+Procedures for deciding the fairness of allocations and finding fair allocations.
 
 Author: Erel Segai-Halevi
 Date:   2017-02
@@ -424,19 +424,11 @@ def isEnvyFree(prefProfile, allocation, isWeaklyBetter):
     True
     >>> isNDDEnvyFree(prefProfile,allocation)
     True
-    >>> isPDDEnvyFree(prefProfile,allocation)
-    True
-    >>> isPossiblyEnvyFree(prefProfile,allocation)
-    True
 
     >>> allocation = {"Alice":[6,4], "Bob":[5,3]}
     >>> isNecessarilyEnvyFree(prefProfile,allocation)
     True
     >>> isNDDEnvyFree(prefProfile,allocation)
-    True
-    >>> isPDDEnvyFree(prefProfile,allocation)
-    True
-    >>> isPossiblyEnvyFree(prefProfile,allocation)
     True
 
     >>> allocation = {"Alice":[6,3,1], "Bob":[5,4,2]}
@@ -444,10 +436,6 @@ def isEnvyFree(prefProfile, allocation, isWeaklyBetter):
     False
     >>> isNDDEnvyFree(prefProfile,allocation)
     False
-    >>> isPDDEnvyFree(prefProfile,allocation)
-    True
-    >>> isPossiblyEnvyFree(prefProfile,allocation)
-    True
 
     >>> prefProfile = PrefProfile({"Alice":Pref(ordinal=[2,1,3,4,6,5]), "Bob":Pref(ordinal=[4,3,6,5,2,1])})
     >>> allocation = {"Alice":[1,2,3], "Bob":[4,5,6]}
@@ -469,14 +457,27 @@ def isEnvyFree(prefProfile, allocation, isWeaklyBetter):
 def isNecessarilyEnvyFree(prefProfile, allocation):
     return isEnvyFree(prefProfile, allocation, Pref.isNecessarilyWeaklyBetter)
 
-def isPossiblyEnvyFree(prefProfile, allocation):
+def isWeakPossiblyEnvyFree(prefProfile, allocation):
     return isEnvyFree(prefProfile, allocation, Pref.isPossiblyWeaklyBetter)
+
+def isPossiblyEnvyFree(prefProfile, allocation):
+    raise RuntimeError("This check is not implemented yet")
+    # NOTE: isPossiblyEnvyFree is stronger than isWeakPossiblyEnvyFree! See this paper:
+    # https://www.sciencedirect.com/science/article/abs/pii/S0004370215000880
+    # return isEnvyFree(prefProfile, allocation, Pref.isPossiblyWeaklyBetter)
+
 
 def isNDDEnvyFree(prefProfile, allocation):
     return isEnvyFree(prefProfile, allocation, Pref.isNDDWeaklyBetter)
 
-def isPDDEnvyFree(prefProfile, allocation):
+def isWeakPDDEnvyFree(prefProfile, allocation):
     return isEnvyFree(prefProfile, allocation, Pref.isPDDWeaklyBetter)
+
+def isPDDEnvyFree(prefProfile, allocation):
+    raise RuntimeError("This check is not implemented yet")
+    # NOTE: isPDDEnvyFree is stronger than isWeakPDDEnvyFree! See this paper:
+    # https://arxiv.org/abs/1705.07993
+    # return isEnvyFree(prefProfile, allocation, Pref.isPDDWeaklyBetter)
 
 
 

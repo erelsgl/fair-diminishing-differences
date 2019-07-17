@@ -1,10 +1,10 @@
 #!python3
 
 """
-Simulations of item assignment.
+Simulation of existence and fairness of NDDPR and PDDPR allocations.
 
 Author: Erel Segai-Halevi
-Date:   2017-02
+Date:   2019-07
 """
 
 import numpy as np

@@ -1,7 +1,9 @@
 #!python3
 
 """
-Simulations of item assignment.
+Simulation of existence of NDDPR allocations.
+This is the experiment reported in the IJCAI-2017 version of the paper:
+https://dl.acm.org/citation.cfm?id=3171820
 
 Author: Erel Segai-Halevi
 Date:   2017-02
