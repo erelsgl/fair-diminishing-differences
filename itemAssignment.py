@@ -464,7 +464,6 @@ def isPossiblyEnvyFree(prefProfile, allocation):
     raise RuntimeError("This check is not implemented yet")
     # NOTE: isPossiblyEnvyFree is stronger than isWeakPossiblyEnvyFree! See this paper:
     # https://www.sciencedirect.com/science/article/abs/pii/S0004370215000880
-    # return isEnvyFree(prefProfile, allocation, Pref.isPossiblyWeaklyBetter)
 
 
 def isNDDEnvyFree(prefProfile, allocation):
@@ -477,8 +476,6 @@ def isPDDEnvyFree(prefProfile, allocation):
     raise RuntimeError("This check is not implemented yet")
     # NOTE: isPDDEnvyFree is stronger than isWeakPDDEnvyFree! See this paper:
     # https://arxiv.org/abs/1705.07993
-    # return isEnvyFree(prefProfile, allocation, Pref.isPDDWeaklyBetter)
-
 
 
 if __name__ == "__main__":
