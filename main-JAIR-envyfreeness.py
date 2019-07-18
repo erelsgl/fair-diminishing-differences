@@ -134,8 +134,7 @@ if __name__ == "__main__":
     iterations = 1000
     createResults = False
     if createResults:
-        filename = str(datetime.now())
-        # filename = "3agents-1000iters-ef"
+        filename = "temporary/" + str(datetime.now())
         (results1, results2) = simulations.simulateTwice(
             checkEnvyFreeness, columnNames, agents, iterations, filename)
     else:   # Use existing results:

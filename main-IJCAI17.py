@@ -83,11 +83,10 @@ if __name__ == "__main__":
 	iterations = 10
 	createResults = False
 	if createResults:
-		filename = str(datetime.now())
+		filename = "temporary/"+str(datetime.now())
 		(results1, results2) = simulations.simulateTwice(
 			checkProportionality, columnNames, agents, iterations, filename)
 	else:   # Use existing results:
-		# filename = "3agents-200iters"
 		# filename = "2agents-1000iters"
 		filename = "2agents-1000iters-scale"
 		results1 = pandas.read_csv("results/"+filename+"-noise.csv")

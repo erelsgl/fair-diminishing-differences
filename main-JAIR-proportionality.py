@@ -117,10 +117,7 @@ if __name__ == "__main__":
 	iterations = 1000
 	createResults = False
 	if createResults:
-		# filename = str(datetime.now())
-		# filename = "2agents-1000iters-pr"
-		filename = "3agents-1000iters-pra"
-		# filename = "3agents-50iters-pr"
+		filename = "temporary/"+str(datetime.now())
 		(results1, results2) = simulations.simulateTwice(
 			checkProportionality, columnNames, agents, iterations, filename)
 	else:   # Use existing results:
