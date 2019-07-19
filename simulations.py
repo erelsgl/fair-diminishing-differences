@@ -168,10 +168,13 @@ def simulateTwice(checkSingleProfile, columnNames:list,
 
 titleFontSize = 14
 legendFontSize = 10
-axesFontSize = 16
+axesFontSize = 13
 
 
-def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, title:str="probability", errorbars:bool=False):
+def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, title:str="probability", errorbars:bool=False, bbox_to_anchor=None):
+
+    ### Subplot 1: by noise size
+
     ax = plt.subplot(1, 2, 1)
     agentCount = int(results1['Agents'][0])
     iterations = int(results1['Iterations'][0])
@@ -181,11 +184,19 @@ def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, t
                  fontsize=titleFontSize, weight='bold')
     ax.set_xlabel('Noise size', fontsize=axesFontSize)
 
+    x_values = results1['Noise size']
     for columnName,style in columnsAndStyles:
-        results1.plot(x='Noise size', y=columnName, yerr=columnName+" err" if errorbars else None,
-                      ax=ax, legend=True, style=style, fontsize=axesFontSize)
+        y_values = results1[columnName]
+        if errorbars:
+            yerr_values = results1[columnName + " err"]
+            ax.errorbar(x_values, y_values, yerr=yerr_values, fmt=style)
+        else:
+            ax.plot(x_values, y_values, fmt=style)
+    plt.xticks(x_values.tolist(), fontsize=axesFontSize)
+    plt.yticks([0,0.2,0.4,0.6,0.8,1], fontsize=axesFontSize)
 
-    plt.legend(loc=0, prop={'size': legendFontSize})
+
+    ### Subplot 2: by number of items
 
     ax = plt.subplot(1, 2, 2, sharey=ax)
     agentCount = int(results2['Agents'][0])
@@ -195,15 +206,23 @@ def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, t
     ax.set_title(title+" vs. items, " + str(agentCount) + ' agents, |noise|<=' + str(maxNoise),
                  fontsize=titleFontSize, weight='bold')
     ax.set_xlabel('Items per agent', fontsize=axesFontSize)
-
+    x_values = results2['Items per agent']
     for columnName,style in columnsAndStyles:
-        results2.plot(x='Items per agent', y=columnName, yerr=columnName+" err" if errorbars else None,
-                      ax=ax, legend=True, style=style, fontsize=axesFontSize)
+        y_values = results2[columnName]
+        if errorbars:
+            yerr_values = results2[columnName + " err"]
+            ax.errorbar(x_values, y_values, yerr=yerr_values, fmt=style)
+        else:
+            ax.plot(x_values, y_values, fmt=style)
+    plt.xticks(x_values.tolist(), fontsize=axesFontSize)
+    plt.yticks([0,0.2,0.4,0.6,0.8,1], fontsize=axesFontSize)
 
-    itemCounts = results2['Items per agent'].tolist()
+    ax.legend(prop={'size': legendFontSize}, loc='center left')
+    the_legend = ax.legend()
+    the_legend.set_bbox_to_anchor([1.3,0.7])
+    for t in the_legend.get_texts():
+        t.set_text(t.get_text().replace(title,""))
 
-    plt.legend(loc=0, prop={'size': legendFontSize})
-    plt.xticks(itemCounts)
 
     plt.show()
 

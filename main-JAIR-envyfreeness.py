@@ -169,7 +169,7 @@ if __name__ == "__main__":
         ('WeakPDDEF precision', 'g-s'),
         ('Baseline precision', 'm-1'),
         # ('PosEF precision', 'r-v'),
-		('WeakPosEF precision', 'g-s'),
+		('WeakPosEF precision', 'r-v'),
 	]
     columnsForRecall = [
         ('WeakPosEF recall', 'r-v'),

@@ -121,8 +121,8 @@ if __name__ == "__main__":
 		(results1, results2) = simulations.simulateTwice(
 			checkProportionality, columnNames, agents, iterations, filename)
 	else:   # Use existing results:
-		filename = "3agents-1000iters-pr"
-		# filename = "2agents-1000iters-pr"
+		# filename = "3agents-1000iters-pr"
+		filename = "2agents-1000iters-pr"
 		results1 = pandas.read_csv("results/"+filename+"-noise.csv")
 		results2 = pandas.read_csv("results/"+filename+"-items.csv")
 
