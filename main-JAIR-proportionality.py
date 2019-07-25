@@ -148,7 +148,7 @@ if __name__ == "__main__":
 	columnsForPrecision = [
 		('NecPR precision', 'k-o'),
 		('ABCCBA precision', 'c-x'),
-		('NDDPR precision', 'b-h'),
+		('NDDPR precision', 'b-*'),
 		('PDDPR precision', 'g-s'),
 		('Baseline precision', 'm-1'),
 		('PosPR precision', 'r-v'),
@@ -158,12 +158,12 @@ if __name__ == "__main__":
 		# ('ABCCBA recall', 'c-x'),
 		# ('Baseline recall', 'm-1'),
 		('PDDPR recall', 'g-s'),
-		('NDDPR recall', 'b-h'),
+		('NDDPR recall', 'b-*'),
 		('NecPR recall', 'k-o'),
 	]
 	columnsForF1 = [
 		('NecPR F1', 'k-o'),
-		('NDDPR F1', 'b-h'),
+		('NDDPR F1', 'b-*'),
 		('PDDPR F1', 'g-s'),
 		('PosPR F1', 'r-v'),
 		('ABCCBA F1', 'c-x'),
