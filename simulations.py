@@ -167,8 +167,9 @@ def simulateTwice(checkSingleProfile, columnNames:list,
 
 
 titleFontSize = 14
-legendFontSize = 10
+legendFontSize = 12
 axesFontSize = 13
+markerSize=12
 
 
 def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, title:str="probability", errorbars:bool=False, bbox_to_anchor=None):
@@ -177,7 +178,7 @@ def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, t
 
     ax = plt.subplot(1, 2, 1)
     agentCount = int(results1['Agents'][0])
-    iterations = int(results1['Iterations'][0])
+    # iterations = int(results1['Iterations'][0])
     itemCounts1 = int(results1['Items per agent'][0])
 
     ax.set_title(title+" vs. noise, " + str(agentCount) + ' agents, ' + str(itemCounts1) + ' items per agent',
@@ -189,9 +190,9 @@ def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, t
         y_values = results1[columnName]
         if errorbars:
             yerr_values = results1[columnName + " err"]
-            ax.errorbar(x_values, y_values, yerr=yerr_values, fmt=style)
+            ax.errorbar(x_values, y_values, yerr=yerr_values, fmt=style, markersize=markerSize)
         else:
-            ax.plot(x_values, y_values, fmt=style)
+            ax.plot(x_values, y_values, fmt=style, markersize=markerSize)
     plt.xticks(x_values.tolist(), fontsize=axesFontSize)
     plt.yticks([0,0.2,0.4,0.6,0.8,1], fontsize=axesFontSize)
 
@@ -211,9 +212,9 @@ def plotResults(results1:DataFrame, results2:DataFrame, columnsAndStyles:list, t
         y_values = results2[columnName]
         if errorbars:
             yerr_values = results2[columnName + " err"]
-            ax.errorbar(x_values, y_values, yerr=yerr_values, fmt=style)
+            ax.errorbar(x_values, y_values, yerr=yerr_values, fmt=style, markersize=markerSize)
         else:
-            ax.plot(x_values, y_values, fmt=style)
+            ax.plot(x_values, y_values, fmt=style, markersize=markerSize)
     plt.xticks(x_values.tolist(), fontsize=axesFontSize)
     plt.yticks([0,0.2,0.4,0.6,0.8,1], fontsize=axesFontSize)
 
